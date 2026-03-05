@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Car Gear Game</title>
+<style>
+body {
+  margin: 0;
+  background: #333;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+#gameCanvas {
+  background: #555;
+  display: block;
+  margin: 0 auto;
+}
+button {
+  position: fixed;
+  bottom: 10px;
+  font-size: 16px;
+  padding: 10px;
+  margin: 2px;
+}
+#score {
+  color: white;
+  font-size: 20px;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<div id="score">Score: 0</div>
+
+<!-- Control Buttons -->
+<button id="leftBtn">Left</button>
+<button id="rightBtn">Right</button>
+<button id="gear1">1</button>
+<button id="gear2">2</button>
+<button id="gear3">3</button>
+<button id="gear4">4</button>
+<button id="gear5">5</button>
+<button id="gearR">R</button>
+<button id="brake">Brake</button>
+<button id="nitro">Nitro</button>
+
+<script>
+// Basic Car Game JS
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let car = { x: 180, y: 500, width: 40, height: 70, speed: 5 };
+let traffic = [];
+let score = 0;
+let currentSpeed = 2;
+
+// Generate traffic cars
+function createTraffic() {
+  let x = Math.floor(Math.random() * 4) * 100 + 20;
+  traffic.push({ x: x, y: -70, width: 40, height: 70 });
+}
+
+function drawCar() {
+  ctx.fillStyle = 'red';
+  ctx.fillRect(car.x, car.y, car.width, car.height);
+}
+
+function drawTraffic() {
+  ctx.fillStyle = 'yellow';
+  traffic.forEach(t => ctx.fillRect(t.x, t.y, t.width, t.height));
+}
+
+function updateTraffic() {
+  traffic.forEach(t => t.y += currentSpeed);
+  traffic = traffic.filter(t => t.y < canvas.height);
+}
+
+function checkCollision() {
+  for (let t of traffic) {
+    if (car.x < t.x + t.width &&
+        car.x + car.width > t.x &&
+        car.y < t.y + t.height &&
+        car.y + car.height > t.y) {
+      alert('Game Over! Your score: ' + score);
+      score = 0;
+      traffic = [];
+      car.x = 180;
+    }
+  }
+}
+
+function drawScore() {
+  document.getElementById('score').innerText = 'Score: ' + score;
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawCar();
+  drawTraffic();
+  updateTraffic();
+  checkCollision();
+  drawScore();
+  score++;
+  if (score % 50 === 0) createTraffic();
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+
+// Controls
+document.getElementById('leftBtn').onclick = () => car.x -= car.speed;
+document.getElementById('rightBtn').onclick = () => car.x += car.speed;
+document.getElementById('gear1').onclick = () => currentSpeed = 2;
+document.getElementById('gear2').onclick = () => currentSpeed = 4;
+document.getElementById('gear3').onclick = () => currentSpeed = 6;
+document.getElementById('gear4').onclick = () => currentSpeed = 8;
+document.getElementById('gear5').onclick = () => currentSpeed = 10;
+document.getElementById('gearR').onclick = () => currentSpeed = -2;
+document.getElementById('brake').onclick = () => currentSpeed = 0;
+document.getElementById('nitro').onclick = () => currentSpeed += 5;
+</script>
+
+</body>
+</html>
